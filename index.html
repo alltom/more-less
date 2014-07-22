@@ -1,0 +1,257 @@
+<style>
+* {
+	font-size: 18pt;
+}
+</style>
+<div id="history"></div>
+<form><p><span id="question"></span> <input id="answer" type="text" /></p></form>
+
+<script src="jquery.min.js"></script>
+<script src="underscore.min.js"></script>
+<script>
+var turns = [];
+
+function makeTurn(previousWord) {
+	var adjectives = [
+		{ adjective: 'angry', comparative: 'angrier' },
+		{ adjective: 'bad', comparative: 'worse' },
+		{ adjective: 'big', comparative: 'bigger' },
+		{ adjective: 'bitter', comparative: 'bitterer' },
+		{ adjective: 'black', comparative: 'blacker' },
+		{ adjective: 'bland', comparative: 'blander' },
+		{ adjective: 'bloody', comparative: 'bloodier' },
+		{ adjective: 'blue', comparative: 'bluer' },
+		{ adjective: 'bold', comparative: 'bolder' },
+		{ adjective: 'bossy', comparative: 'bossier' },
+		{ adjective: 'brave', comparative: 'braver' },
+		{ adjective: 'brief', comparative: 'briefer' },
+		{ adjective: 'bright', comparative: 'brighter' },
+		{ adjective: 'broad', comparative: 'broader' },
+		{ adjective: 'busy', comparative: 'busier' },
+		{ adjective: 'calm', comparative: 'calmer' },
+		{ adjective: 'cheap', comparative: 'cheaper' },
+		{ adjective: 'chewy', comparative: 'chewier' },
+		{ adjective: 'chubby', comparative: 'chubbier' },
+		{ adjective: 'classy', comparative: 'classier' },
+		{ adjective: 'clean', comparative: 'cleaner' },
+		{ adjective: 'clear', comparative: 'clear' },
+		{ adjective: 'clever', comparative: 'cleverer' },
+		{ adjective: 'close', comparative: 'closer' },
+		{ adjective: 'cloudy', comparative: 'cloudier' },
+		{ adjective: 'clumsy', comparative: 'clumsier' },
+		{ adjective: 'coarse', comparative: 'coarser' },
+		{ adjective: 'cold', comparative: 'colder' },
+		{ adjective: 'cool', comparative: 'cooler' },
+		{ adjective: 'crazy', comparative: 'crazier' },
+		{ adjective: 'creamy', comparative: 'creamier' },
+		{ adjective: 'creepy', comparative: 'creepier' },
+		{ adjective: 'crispy', comparative: 'crispier' },
+		{ adjective: 'cruel', comparative: 'crueler' },
+		{ adjective: 'crunchy', comparative: 'crunchier' },
+		{ adjective: 'curly', comparative: 'curly' },
+		{ adjective: 'curvy', comparative: 'curvier' },
+		{ adjective: 'cute', comparative: 'cuter' },
+		{ adjective: 'damp', comparative: 'damper' },
+		{ adjective: 'dark', comparative: 'darker' },
+		{ adjective: 'deadly', comparative: 'deadlier' },
+		{ adjective: 'deep', comparative: 'deeper' },
+		{ adjective: 'dense', comparative: 'denser' },
+		{ adjective: 'dirty', comparative: 'dirtier' },
+		{ adjective: 'dry', comparative: 'drier' },
+		{ adjective: 'dull', comparative: 'duller' },
+		{ adjective: 'dumb', comparative: 'dumber' },
+		{ adjective: 'dusty', comparative: 'dustier' },
+		{ adjective: 'early', comparative: 'earlier' },
+		{ adjective: 'easy', comparative: 'easier' },
+		{ adjective: 'faint', comparative: 'fainter' },
+		{ adjective: 'fair', comparative: 'fairer' },
+		{ adjective: 'fancy', comparative: 'fancier' },
+		{ adjective: 'far', comparative: 'further' },
+		{ adjective: 'fast', comparative: 'faster' },
+		{ adjective: 'fat', comparative: 'fatter' },
+		{ adjective: 'few', comparative: 'fewer' },
+		{ adjective: 'fierce', comparative: 'fiercer' },
+		{ adjective: 'filthy', comparative: 'filthier' },
+		{ adjective: 'fine', comparative: 'finer' },
+		{ adjective: 'firm', comparative: 'firmer' },
+		{ adjective: 'fit', comparative: 'fitter' },
+		{ adjective: 'flaky', comparative: 'flakier' },
+		{ adjective: 'flat', comparative: 'flatter' },
+		{ adjective: 'fresh', comparative: 'fresher' },
+		{ adjective: 'friendly', comparative: 'friendlier' },
+		{ adjective: 'full', comparative: 'fuller' },
+		{ adjective: 'funny', comparative: 'funnier' },
+		{ adjective: 'gentle', comparative: 'gentler' },
+		{ adjective: 'gloomy', comparative: 'gloomier' },
+		{ adjective: 'good', comparative: 'better' },
+		{ adjective: 'grand', comparative: 'grander' },
+		{ adjective: 'grave', comparative: 'graver' },
+		{ adjective: 'greasy', comparative: 'greasier' },
+		{ adjective: 'great', comparative: 'greater' },
+		{ adjective: 'greedy', comparative: 'greedier' },
+		{ adjective: 'gross', comparative: 'grosser' },
+		{ adjective: 'guilty', comparative: 'guilter' },
+		{ adjective: 'hairy', comparative: 'hairier' },
+		{ adjective: 'handy', comparative: 'handier' },
+		{ adjective: 'happy', comparative: 'happier' },
+		{ adjective: 'hard', comparative: 'harder' },
+		{ adjective: 'harsh', comparative: 'harsher' },
+		{ adjective: 'healthy', comparative: 'healthier' },
+		{ adjective: 'heavy', comparative: 'heavier' },
+		{ adjective: 'high', comparative: 'higher' },
+		{ adjective: 'hip', comparative: 'hipper' },
+		{ adjective: 'hot', comparative: 'hotter' },
+		{ adjective: 'humble', comparative: 'humbler' },
+		{ adjective: 'hungry', comparative: 'hungrier' },
+		{ adjective: 'icy', comparative: 'icier' },
+		{ adjective: 'itchy', comparative: 'itchier' },
+		{ adjective: 'juicy', comparative: 'juicier' },
+		{ adjective: 'kind', comparative: 'kinder' },
+		{ adjective: 'large', comparative: 'larger' },
+		{ adjective: 'late', comparative: 'later' },
+		{ adjective: 'lazy', comparative: 'lazier' },
+		{ adjective: 'light', comparative: 'lighter' },
+		{ adjective: 'likely', comparative: 'likelier' },
+		{ adjective: 'little', comparative: 'littler' },
+		{ adjective: 'lively', comparative: 'livelier' },
+		{ adjective: 'lonely', comparative: 'lonelier' },
+		{ adjective: 'long', comparative: 'longer' },
+		{ adjective: 'loud', comparative: 'louder' },
+		{ adjective: 'lovely', comparative: 'lovelier' },
+		{ adjective: 'low', comparative: 'lower' },
+		{ adjective: 'mad', comparative: 'madder' },
+		{ adjective: 'mean', comparative: 'meaner' },
+		{ adjective: 'messy', comparative: 'messier' },
+		{ adjective: 'mild', comparative: 'milder' },
+		{ adjective: 'moist', comparative: 'moister' },
+		{ adjective: 'narrow', comparative: 'narrower' },
+		{ adjective: 'nasty', comparative: 'nastier' },
+		{ adjective: 'naughty', comparative: 'naughtier' },
+		{ adjective: 'near', comparative: 'nearer' },
+		{ adjective: 'neat', comparative: 'neater' },
+		{ adjective: 'needy', comparative: 'needier' },
+		{ adjective: 'new', comparative: 'newer' },
+		{ adjective: 'nice', comparative: 'nicer' },
+		{ adjective: 'noisy', comparative: 'noisier' },
+		{ adjective: 'odd', comparative: 'odder' },
+		{ adjective: 'oily', comparative: 'oilier' },
+		{ adjective: 'old', comparative: 'older' },
+		{ adjective: 'plain', comparative: 'plainer' },
+		{ adjective: 'polite', comparative: 'politer' },
+		{ adjective: 'poor', comparative: 'poorer' },
+		{ adjective: 'pretty', comparative: 'prettier' },
+		{ adjective: 'proud', comparative: 'prouder' },
+		{ adjective: 'pure', comparative: 'purer' },
+		{ adjective: 'quick', comparative: 'quicker' },
+		{ adjective: 'quiet', comparative: 'quieter' },
+		{ adjective: 'rare', comparative: 'rarer' },
+		{ adjective: 'raw', comparative: 'rawer' },
+		{ adjective: 'rich', comparative: 'richer' },
+		{ adjective: 'ripe', comparative: 'riper' },
+		{ adjective: 'risky', comparative: 'riskier' },
+		{ adjective: 'roomy', comparative: 'roomier' },
+		{ adjective: 'rough', comparative: 'rougher' },
+		{ adjective: 'rude', comparative: 'ruder' },
+		{ adjective: 'rusty', comparative: 'rustier' },
+		{ adjective: 'sad', comparative: 'sadder' },
+		{ adjective: 'safe', comparative: 'safer' },
+		{ adjective: 'salty', comparative: 'saltier' },
+		{ adjective: 'sane', comparative: 'saner' },
+		{ adjective: 'scary', comparative: 'scarier' },
+		{ adjective: 'shallow', comparative: 'shallower' },
+		{ adjective: 'sharp', comparative: 'sharper' },
+		{ adjective: 'shiny', comparative: 'shinier' },
+		{ adjective: 'short', comparative: 'shorter' },
+		{ adjective: 'shy', comparative: 'shyer' },
+		{ adjective: 'silly', comparative: 'sillier' },
+		{ adjective: 'simple', comparative: 'simpler' },
+		{ adjective: 'sincere', comparative: 'sincerer' },
+		{ adjective: 'skinny', comparative: 'skinnier' },
+		{ adjective: 'sleepy', comparative: 'sleepier' },
+		{ adjective: 'slim', comparative: 'slimmer' },
+		{ adjective: 'slimy', comparative: 'slimier' },
+		{ adjective: 'slow', comparative: 'slower' },
+		{ adjective: 'small', comparative: 'smaller' },
+		{ adjective: 'smart', comparative: 'smarter' },
+		{ adjective: 'smelly', comparative: 'smellier' },
+		{ adjective: 'smoky', comparative: 'smokier' },
+		{ adjective: 'smooth', comparative: 'smoother' },
+		{ adjective: 'soft', comparative: 'softer' },
+		{ adjective: 'soon', comparative: 'sooner' },
+		{ adjective: 'sore', comparative: 'sorer' },
+		{ adjective: 'sorry', comparative: 'sorrier' },
+		{ adjective: 'sour', comparative: 'sourer' },
+		{ adjective: 'spicy', comparative: 'spicier' },
+		{ adjective: 'steep', comparative: 'steeper' },
+		{ adjective: 'stingy', comparative: 'stingier' },
+		{ adjective: 'strange', comparative: 'stranger' },
+		{ adjective: 'strict', comparative: 'stricter' },
+		{ adjective: 'strong', comparative: 'stronger' },
+		{ adjective: 'sunny', comparative: 'sunnier' },
+		{ adjective: 'sweaty', comparative: 'sweatier' },
+		{ adjective: 'sweet', comparative: 'sweeter' },
+		{ adjective: 'tall', comparative: 'taller' },
+		{ adjective: 'tan', comparative: 'tanner' },
+		{ adjective: 'tasty', comparative: 'tastier' },
+		{ adjective: 'thick', comparative: 'thicker' },
+		{ adjective: 'thin', comparative: 'thinner' },
+		{ adjective: 'thirsty', comparative: 'thirstier' },
+		{ adjective: 'tiny', comparative: 'tinier' },
+		{ adjective: 'tough', comparative: 'tougher' },
+		{ adjective: 'true', comparative: 'truer' },
+		{ adjective: 'ugly', comparative: 'uglier' },
+		{ adjective: 'warm', comparative: 'warmer' },
+		{ adjective: 'weak', comparative: 'weaker' },
+		{ adjective: 'wealthy', comparative: 'wealthier' },
+		{ adjective: 'weird', comparative: 'weirder' },
+		{ adjective: 'wet', comparative: 'wetter' },
+		{ adjective: 'wide', comparative: 'wider' },
+		{ adjective: 'wild', comparative: 'wilder' },
+		{ adjective: 'windy', comparative: 'windier' },
+		{ adjective: 'wise', comparative: 'wiser' },
+		{ adjective: 'worldly', comparative: 'worldlier' },
+		{ adjective: 'worthy', comparative: 'worthier' },
+		{ adjective: 'young', comparative: 'younger' },
+	];
+
+	return {
+		alternates: _.sample(adjectives, 3).map(alternateFromWord),
+		previous: previousWord,
+	};
+
+	function alternateFromWord(word) {
+		return _.sample(['less ' + word.adjective, word.comparative]);
+	}
+}
+
+function render() {
+	$('#history').empty();
+
+	for (var i = 0; i < turns.length; i++) {
+		var turn = turns[i];
+		if (i < turns.length - 1) {
+			$('<div />').text(questionForTurn(turn) + ' ' + turn.answer).appendTo('#history');
+		} else {
+			$('#question').text(questionForTurn(turn));
+			$('#answer').val('');
+		}
+	}
+}
+
+function questionForTurn(turn) {
+	return 'What is slightly ' + turn.alternates[0] + ' than ' + turn.previous + '?';
+}
+
+$(function () {
+	turns.push(makeTurn('mountain'));
+	$('form').on('submit', function () {
+		var word = $('#answer').val();
+		turns[turns.length - 1].answer = word;
+		turns.push(makeTurn(word));
+		render();
+		return false;
+	});
+
+	render();
+});
+</script>
